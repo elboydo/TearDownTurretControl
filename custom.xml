@@ -1,0 +1,124 @@
+<scene version="3" shadowVolume="200 100 200">
+
+	<environment template="sunny" skyboxrot="-45"/>
+	<body>		
+		<voxbox pos="-100.0 -0.1 -100.0" size="2000 1 2000" texture="4 1"/>
+	</body>
+	
+	<boundary>
+		<vertex pos="-100.0 -100.0"/>
+		<vertex pos="100.0 -100.0"/>
+		<vertex pos="100.0 100.0"/>
+		<vertex pos="-100.0 100.0"/>
+	</boundary>
+
+	<vehicle tags="technicalVehicle" name="technical2" pos="0 0 5" rot="0.0 0.0 0.0" driven="false" sound="suv2" spring="0.8" damping="0.8" topspeed="60" acceleration="2" strength="5" antispin="0" antiroll="0.2" difflock="0.5" steerassist="0.0">
+		<body tags="technicalBody" pos="-0.05 0.6 -0.25" rot="0.0 0.0 0.0" dynamic="true">
+			<vox pos="0.05 -0.2 0.25" rot="0 180 0" density="2" strength="3" file="LEVEL/technical_2.vox" object="body">
+				<light pos="0.75 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.1 0.1" unshadowed="0.3"/>
+				<light pos="-0.65 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.1 0.1" unshadowed="0.3"/>
+				<light pos="0.65 0.65 2.1" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="30" angle="90" penumbra="30" size="0.1" unshadowed="0.2" glare="0.35"/>
+				<light pos="-0.55 0.65 2.1" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="30" angle="90" penumbra="30" size="0.1" unshadowed="0.2" glare="0.35"/>
+				<location tags="exhaust" pos="0.5 0.05 -2.1" rot="-180.0 360.0 -180.0"/>
+				<location tags="vital" pos="0.05 0.55 1.4" rot="-180.0 360.0 -180.0"/>
+				<location tags="player" pos="0.35 1.25 0.25" rot="0.0 0.0 0.0"/>
+				
+				<vox tags = "canon interact=canon" density="1.2" pos="0 1.8 -.9" strength="2" rot="0.0 0 0.0"  file="LEVEL/technical_2.vox" object="MG" prop="true">					
+
+				<joint tags="gunMount" pos="0.05  0 -.7" rot="90 0 0.0" type="hinge" size="0.5" rotstrength="0.1" rotspring="0" sound="true">
+					<!-- <voxbox name="joint visualizer" pos="-0.05 -0.05 -0.05" prop="true" collide="false" size="1 1 1" color="1 0.0 0.0"/> -->
+				</joint>	
+				</vox>
+			<vox pos="0.00 .4 -2.7" rot="0 0 0" density="2" strength="3" file="LEVEL/technical_2.vox" object="boot" prop="true">
+								<joint  pos="0.0 0 0" rot="0 -90 0.0" type="hinge" size="0.1" rotstrength="0.1" rotspring="0" limits="0 100" sound="true">
+					<!-- <voxbox name="joint visualizer" pos="-0.05 -0.05 -0.05" prop="true" collide="false" size="1 1 1" color="1 0.0 0.0"/> -->
+				</joint>	
+
+				</vox>
+			
+			</vox>			
+			
+			<vox tags = "rocketAmmo interact=UseRockets" density="1.2" pos="-.15 .5 1.4" strength="2" rot="0.0 0 0.0"  file="LEVEL/technical_2.vox" object="RocketBox" prop="true">
+								<joint  pos="0.0 0 0" rot="0 -90 0.0" type="hinge" size="0.5" rotstrength="1" rotspring="0" limits="-5 5" sound="true">
+					<!-- <voxbox name="joint visualizer" pos="-0.05 -0.05 -0.05" prop="true" collide="false" size="1 1 1" color="1 0.0 0.0"/> -->
+				</joint>	
+			</vox>	
+			<vox tags = "mgAmmo interact=UseBullets" density="1.2" pos=".42 .5 1.4" strength="2" rot="0.0 180 0.0"  file="LEVEL/technical_2.vox" object="dshkAmmo" prop="true">
+								<joint  pos="0.0 0 0" rot="0 -90 0.0" type="hinge" size="0.5" rotstrength="1" rotspring="0" limits="-5 5" sound="true">
+					<!-- <voxbox name="joint visualizer" pos="-0.05 -0.05 -0.05" prop="true" collide="false" size="1 1 1" color="1 0.0 0.0"/> -->
+				</joint>	
+			</vox>	
+
+
+
+			<wheel name="bl" pos="-0.65 -0.15 1.9" drive="1" travel="-0.1 0.2">
+				<vox pos="-0.1 -0.45 -0.05" rot="0.0 -180.0 0.0" file="LEVEL/technical_2.vox" object="wheel_bl"/>
+			</wheel>
+			<wheel name="br" pos="0.65 -0.15 1.9" drive="1" travel="-0.1 0.2">
+				<vox pos="0.1 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical_2.vox" object="wheel_br"/>
+			</wheel>
+			<wheel name="fl" pos="-0.75 -0.15 -1.4" drive="1" steer="1" travel="-0.1 0.2">
+				<vox pos="0.0 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical_2.vox" object="wheel_fl"/>
+			</wheel>
+			<wheel name="fr" pos="0.65 -0.15 -1.4" drive="1" steer="1" travel="-0.1 0.2">
+				<vox pos="0.1 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical_2.vox" object="wheel_fr"/>
+			</wheel>w
+		</body>
+		<!-- <body tags="mountBody" pos="-0.05 .5 -0.25" > -->
+		<!-- <body tags="canonb" pos="-0.05 1.6 1.9" dynamic="true"> -->
+						<!-- </body> -->
+<!-- 		</body> -->
+	</vehicle>
+
+
+
+<!-- 
+	<vehicle tags="technicalVehicle2" name="technical2" pos="0 0 5" rot="0.0 0.0 0.0" driven="false" sound="suv2" spring="0.8" damping="0.8" topspeed="60" acceleration="2" strength="5" antispin="0" antiroll="0.2" difflock="0.5" steerassist="0.0">
+		<body tags="technicalBody2" pos="-0.05 0.6 -0.25" rot="0.0 0.0 0.0" dynamic="true">
+			<vox pos="0.05 -0.2 0.25" rot="0 180 0" density="2" strength="3" file="LEVEL/technical_2.vox" object="body">
+				<light pos="0.75 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.1 0.1" unshadowed="0.3"/>
+				<light pos="-0.65 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.1 0.1" unshadowed="0.3"/>
+				<light pos="0.65 0.65 2.1" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="30" angle="90" penumbra="30" size="0.1" unshadowed="0.2" glare="0.35"/>
+				<light pos="-0.55 0.65 2.1" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="30" angle="90" penumbra="30" size="0.1" unshadowed="0.2" glare="0.35"/>
+				<location tags="exhaust" pos="0.5 0.05 -2.1" rot="-180.0 360.0 -180.0"/>
+				<location tags="vital" pos="0.05 0.55 1.4" rot="-180.0 360.0 -180.0"/>
+				<location tags="player" pos="0.35 1.25 0.25" rot="0.0 0.0 0.0"/>
+				<joint tags="gunMount" pos="0.05 1.8 -1.55" rot="90 0 0.0" type="hinge" size="0.5" rotstrength="0.1" rotspring="0" sound="true">
+					<voxbox name="joint visualizer" pos="-0.05 -0.05 -0.05" prop="true" collide="false" size="1 1 1" color="1 0.0 0.0"/>
+				</joint>	
+
+			<vox pos="0.00 .4 -2.7" rot="0 0 0" density="2" strength="3" file="LEVEL/technical_2.vox" object="boot" prop="true">
+								<joint  pos="0.0 0 0" rot="0 -90 0.0" type="hinge" size="0.1" rotstrength="0.1" rotspring="0" limits="0 100" sound="true">
+					<voxbox name="joint visualizer" pos="-0.05 -0.05 -0.05" prop="true" collide="false" size="1 1 1" color="1 0.0 0.0"/>
+				</joint>	
+
+				</vox>
+				
+						
+			</vox>			
+			<wheel name="bl" pos="-0.65 -0.15 1.9" drive="1" travel="-0.1 0.2">
+				<vox pos="-0.1 -0.45 -0.05" rot="0.0 -180.0 0.0" file="LEVEL/technical_2.vox" object="wheel_bl"/>
+			</wheel>
+			<wheel name="br" pos="0.65 -0.15 1.9" drive="1" travel="-0.1 0.2">
+				<vox pos="0.1 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical_2.vox" object="wheel_br"/>
+			</wheel>
+			<wheel name="fl" pos="-0.75 -0.15 -1.4" drive="1" steer="1" travel="-0.1 0.2">
+				<vox pos="0.0 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical_2.vox" object="wheel_fl"/>
+			</wheel>
+			<wheel name="fr" pos="0.65 -0.15 -1.4" drive="1" steer="1" travel="-0.1 0.2">
+				<vox pos="0.1 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical_2.vox" object="wheel_fr"/>
+			</wheel>w
+		</body>
+		<body tags="mountBody" pos="-0.05 1.6 -0.25" >
+		<body tags="canon" pos="-0.05 1.6 1.9" dynamic="true">
+			<vox density="1.2" pos="0 0 -0.7" strength="2" rot="0.0 180 0.0"  file="LEVEL/technical_2.vox" object="MG"/>					
+			</body>
+		</body>
+	</vehicle> -->
+
+	
+	<script file="main.lua"/>	
+	<script file="LEVEL/scripts/manualMountedGun.lua"/>	
+	<!-- <script file="LEVEL\turret.lua"/> -->
+
+</scene>
