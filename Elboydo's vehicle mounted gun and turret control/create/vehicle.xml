@@ -1,0 +1,632 @@
+<!--
+This is the Create Vehicle level file. It sets the size of the level, what environment to use and all objects, such as vox-models, scripts and boundary, used in the level.
+Positions are given in meters relative to their parent objects position. If an object doesnt have a parent, it is in relation to the bottom center of the game world.
+Sizes are given in voxels. One voxel is 0.1 meters on all sides.
+In this scene the loaded vox file 'ground.vox' is made of several shapes in MagicaVoxel. When loaded in the game they are regarded as one vox. This opens up the possibility of building worlds larger than 256*256*256 voxels with MagicaVoxel. Observe that the individual shapes in the MagicaVoxel scene are all either smaller than the maximum shape size possible in MagicaVoxel or much thinner. This is because the physics in the game might stutter slightly when very large shapes are used.
+Whats new in this scene compared to the basic and island scenes:
+- On line 42 vehicles are introduced and explained.
+- On line 75 lights is introduced and explained.
+- On line 94 locations are introduced and explained.
+- On line 110 wheels are introduced and explained.
+-->
+
+<!-- 
+The 'version' indicates what version of the editor was used to create the level. Leave it as is to make sure scripts are loaded as expected.
+The 'shadowVolume' property sets the area of the game where lighting, and subsequently shadows, are calculated. It is expressed in meters; width, height, length
+-->
+<scene version="3" shadowVolume="200 100 200">
+	<!-- 
+	This sets the environment used for the level. 
+	The 'template' property references a predefined setup of environments. Available environment templates are: 'sunny', 'night', 'sunset', 'sunrise', 'foggy', and 'rain'
+	The 'skyboxrot' sets the rotation of the skybox around the y axis, affecting the direction of the sun light. Explicitly set properties like this overrides the properties in the template. 
+	-->
+	<environment template="night" skyboxrot="-90"/>
+	<body>
+		<!--
+		A voxbox is a basic box shape. By default it is indestructible.
+		The 'pos' property sets the position of the box's top-upper-left corner relative to the bottom center of the game world, in meters.
+		The 'size' property sets the size of the box in voxels as; width, height, and length.
+		The 'color' property sets the color of the voxbox with the values being the Red, Gren, and Blue components in the color, each in the range 0.0 - 1.0
+		-->
+		<voxbox pos="-100.0 -0.1 -100.0" size="2000 1 2000"/>
+	</body>
+	<body>
+		<!-- 
+		A vox is a voxel model loaded from a vox-file.
+		The 'pos' property sets it's position relative to the bottom center of the game world, in meters. 
+		The 'texure' property is used to apply one of the available textures. The first value, to the left of the space, is the index for the wanted texture. The textures can be found in the 'data/gfx/albedo.png' file in the installation folder. The top left white texture is number 0. The second value, to the right of the space, indicates how strong the texture should be applied in the range 0.0 - 1.0. 
+		The 'file' property references the vox-file to be loaded. The 'LEVEL' keyword is a reference to the folder with the same name as the level file i.e., The keyword 'LEVEL' in the vehicle.xml level file (this file) references the folder named 'vehicle'. 
+		-->
+		<vox pos="0.0 0.0 0.0" texture="6 1.0" file="LEVEL/ground.vox"/>
+	</body>
+	<!--
+	This sets up a vehicle together with the other contents encapsulated by the 'vehicle' tag.
+	The 'name' property is the name given to this object, but has no use outside the Teardown editor.
+	The 'pos' property sets it's position relative to the bottom center of the game world, in meters. 
+	The 'rot' property sets the rotation of the object relative to it's parent, or if it has none, the botom center of the game world. The values are given as euler angles around the x, y and z axes.
+	The 'driven' property sets whether the player is driving the vehicle when the level starts.
+	The 'sound' property sets which set of sounds should be used for this vehicle. The vehicle sounds can be found in the 'data/snd/vehicle' folder in the installation folder. The value set here is only the first part of the sound name, i.e., 'sportscar', not 'sportscar-drive.ogg'.
+	The 'spring' property sets stiffness of the suspension springs.
+	The 'damping'property sets the amount of suspension damping for the vehicle.
+	The 'topspeed' property sets the top speed of the vehicle as km/h.
+	The 'acceleration' property is combined with the 'strength' property to control how fast the vehicle accelerates.
+	The 'strength' property sets the engine strength of the vehicle.
+	The 'antispin' property sets to what extent the wheels should be prevented from spinning during acceleration in the range 0.0 - 1.0.
+	The 'antiroll' property sets to what extent the vehicle should be prevented from tipping over. Similar to lowering the center of mass, but looks less weird.
+	The 'difflock' property sets the differential control. 0 is open differential, 1 is fully locked differential. Use 0 for regular cars and 1 for heavy vehicles.
+	The 'steerassist' sets how much arcade steering the vehicle has. Arcade steerings improves handling a lot. Should never be above 1.0.
+	The 'friction' property sets the amount of tire friction for the vehicle. In most cases it should be 1.3. For small cars and sportscars, increase slightly.
+	-->
+	<vehicle name="sportscar" pos="48.0 0.2 -32.5" rot="0.0 163.0 0.0" driven="false" sound="sportscar" spring="1.2" damping="1.0" topspeed="120" acceleration="12" strength="8" antispin="0" antiroll="0.1" difflock=".1" steerassist="0.3" friction="1.9">
+		<!--
+		The 'pos' property of the body in a vehicle sets the center of mass for the vehicle.
+		The 'dynamic' prop sets whether the object should be dynamic, i.e., movable, or 'loose', or not.
+		-->
+		<body pos="-0.05002 0.35 0.25" rot="0.0 0.0 0.0" dynamic="true">
+			<!-- 
+			A vox is a voxel model loaded from a vox-file.
+			The 'pos' property sets it's position relative to its parent, or if it has no parent, the bottom center of the game world, in meters. 
+			The 'density' property is a factor to adjust the mass of an object. Should normaly be 1. Lower for lighter floating objects and higher for heavier objects.
+			The 'strength' sets how resistant the object is to damage from impacts, such as crashing a car into it.
+			The 'file' property references the vox-file to be loaded. The 'LEVEL' keyword is a reference to the folder with the same name as the level file i.e., The keyword 'LEVEL' in the island.xml level file (this file) references the folder named 'island'.
+			The 'object' property is used to reference a specific named shape in a MagicaVoxel file, instead of using the whole file with all its shapes. In this case the car body and the wheels are in the same vox file, so here we reference only the body.
+			-->
+			<vox pos="0.05 -0.15 -0.25" rot="0 180 0" density="2" strength="2" file="LEVEL/sportscar.vox" object="body">
+				<!--
+				A light is a light source in the game world.
+				The 'pos' property sets it's position relative to its parent, or if it has no parent, the bottom center of the game world, in meters. 
+				The 'rot' property sets the rotation of the object relative to it's parent, or if it has none, the botom center of the game world. The values are given as euler angles around the x, y and z axes.
+				The 'type' property sets what type of light source it is. The available lightsources are; 'sphere', 'cone', or 'area'.
+				The 'color' property sets the color of the light with the values being the Red, Gren, and Blue components in the color, each in the range 0.0 - 1.0
+				The 'scale' property is a factor to sclae light intensity.
+				The 'angle' property sets the cone angle in case of 'cone' lights.
+				The 'penumbra' property sets the amount of penumbra (fuzziness at edge of light) for 'cone' lights.
+				The 'size' property sets the light radius in case of 'sphere' or 'cone' lights, width and height in case of 'area' lights. Values are in meters.
+				The 'unshadowed' property set a distance in meters that is always unshadowed. Useful to avoid shadows from light fixtures and/or emissive light surfaces.
+				The 'glare' property sets whether a lens flare should be visible when the player is looking at the light. A value in the range 0.0-1.0.
+				-->
+				<light pos="0.7 0.35 1.9" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="20" angle="50" penumbra="15" size="0.1" unshadowed="0.2" glare="0.4"/>
+				<light pos="-0.6 0.35 1.9" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="20" angle="50" penumbra="15" size="0.1" unshadowed="0.2" glare="0.4"/>
+				<light pos="0.4 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.2 0.1" unshadowed="0.3"/>
+				<light pos="-0.3 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.2 0.1" unshadowed="0.3"/>
+				<light pos="0.6 0.55 -2.1" rot="0.0 -180.0 0.0" type="area" color="1 .1 .1" size="0.2 0.1" unshadowed="0.2" glare="0.2"/>
+				<light pos="-0.5 0.55 -2.1" rot="0.0 -180.0 0.0" type="area" color="1 .1 .1" size="0.2 0.1" unshadowed="0.2" glare="0.2"/>
+				<!--
+				Locations are used for certain functions that is not actual objects in the scene.
+				-->
+				<!--
+				The 'tags' property ('exhaust') of this location indicates that vehicle exhaust will emit from this point. 
+				-->
+				<location tags="exhaust" pos="0.5 0.1 -2.1" rot="-180.0 360.0 -180.0"/>
+				<!-- 
+				The 'tags' property ('vital') of this location indicates that this is a vital part of the vehicle, and the vehicle will be completely unusable if it is destroyed. 
+				-->
+				<location tags="vital" pos="0.05 0.55 -1.4" rot="-180.0 360.0 -180.0"/>
+				<!-- 
+				The 'tags' property ('player') of this location indicates that this is the location of the camera when the player is in the vehicle. 
+				-->
+				<location tags="player" pos="0.4 0.75 0.15" rot="0.0 0.0 0.0"/>
+			</vox>
+			<!-- 
+			Wheels are used to define the wheels of a vehicle. 
+			The 'name' property of this 'wheel' has no functional implication, but indicates that this is the back left wheel.
+			The 'pos' property sets it's position relative to its parent, in this case the body on line 56.
+			The 'drive' property sets how much of the engine power is applied to this wheel. Normaly in the range 0.0-1.0.
+			The 'travel' property sets the suspension travel distance from its normal position along the y axis.
+			-->
+			<wheel name="bl" pos="-0.64999 -0.0 1.2" drive="1" travel="-0.1 0.1">
+				<!--
+				This is the actual vox shape used for the wheel.
+				-->
+				<vox pos="-0.1 -0.35 -0.05" rot="0.0 -180.0 0.0" file="LEVEL/sportscar.vox" object="wheel_bl"/>
+			</wheel>
+			<wheel name="br" pos="0.65001 -0.0 1.2" drive="1" travel="-0.1 0.1">
+				<vox pos="0.2 -0.35 -0.05" rot="0 180 0" file="LEVEL/sportscar.vox" object="wheel_br"/>
+			</wheel>
+			<wheel name="fl" pos="-0.64999 -0.0 -1.4" drive="1" steer="0.7" travel="-0.1 0.1">
+				<vox pos="-0.1 -0.35 -0.05" rot="0 180 0" file="LEVEL/sportscar.vox" object="wheel_fl"/>
+			</wheel>
+			<wheel name="fr" pos="0.65001 -0.0 -1.4" drive="1" steer="0.7" travel="-0.1 0.1">
+				<vox pos="0.2 -0.35 -0.05" rot="0.0 -180.0 0.0" file="LEVEL/sportscar.vox" object="wheel_fr"/>
+			</wheel>
+		</body>
+	</vehicle>
+	<vehicle name="bike" pos="10.0 0.62 10.0" rot="0.0 0.0 0.0" driven="false" sound="sportscar" spring="1.2" damping="1.0" topspeed="120" acceleration="12" strength="8" antispin="0" antiroll="0.1" difflock=".1" steerassist="0.3" friction="1.9">
+		<!--
+		The 'pos' property of the body in a vehicle sets the center of mass for the vehicle.
+		The 'dynamic' prop sets whether the object should be dynamic, i.e., movable, or 'loose', or not.
+		-->
+		<body pos="0.0 0.0 0.0" rot="0.0 0.0 0.0" dynamic="true">
+			<!-- 
+			A vox is a vfoxel model loaded rom a vox-file.
+			The 'pos' property sets it's position relative to its parent, or if it has no parent, the bottom center of the game world, in meters. 
+			The 'density' property is a factor to adjust the mass of an object. Should normaly be 1. Lower for lighter floating objects and higher for heavier objects.
+			The 'strength' sets how resistant the object is to damage from impacts, such as crashing a car into it.
+			The 'file' property references the vox-file to be loaded. The 'LEVEL' keyword is a reference to the folder with the same name as the level file i.e., The keyword 'LEVEL' in the island.xml level file (this file) references the folder named 'island'.
+			The 'object' property is used to reference a specific named shape in a MagicaVoxel file, instead of using the whole file with all its shapes. In this case the car body and the wheels are in the same vox file, so here we reference only the body.
+			-->
+			<vox pos="0.0 0.0 0.0" rot="0 180 0" density="0.5" strength="1" file="LEVEL/bike.vox" object="body">
+				<!--
+				A light is a light source in the game world.
+				The 'pos' property sets it's position relative to its parent, or if it has no parent, the bottom center of the game world, in meters. 
+				The 'rot' property sets the rotation of the object relative to it's parent, or if it has none, the botom center of the game world. The values are given as euler angles around the x, y and z axes.
+				The 'type' property sets what type of light source it is. The available lightsources are; 'sphere', 'cone', or 'area'.
+				The 'color' property sets the color of the light with the values being the Red, Gren, and Blue components in the color, each in the range 0.0 - 1.0
+				The 'scale' property is a factor to sclae light intensity.
+				The 'angle' property sets the cone angle in case of 'cone' lights.
+				The 'penumbra' property sets the amount of penumbra (fuzziness at edge of light) for 'cone' lights.
+				The 'size' property sets the light radius in case of 'sphere' or 'cone' lights, width and height in case of 'area' lights. Values are in meters.
+				The 'unshadowed' property set a distance in meters that is always unshadowed. Useful to avoid shadows from light fixtures and/or emissive light surfaces.
+				The 'glare' property sets whether a lens flare should be visible when the player is looking at the light. A value in the range 0.0-1.0.
+				-->
+				<!--
+				<light pos="0.7 0.35 1.9" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="20" angle="50" penumbra="15" size="0.1" unshadowed="0.2" glare="0.4"/>
+				<light pos="-0.6 0.35 1.9" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="20" angle="50" penumbra="15" size="0.1" unshadowed="0.2" glare="0.4"/>
+				<light pos="0.4 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.2 0.1" unshadowed="0.3"/>
+				<light pos="-0.3 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.2 0.1" unshadowed="0.3"/>
+				<light pos="0.6 0.55 -2.1" rot="0.0 -180.0 0.0" type="area" color="1 .1 .1" size="0.2 0.1" unshadowed="0.2" glare="0.2"/>
+				<light pos="-0.5 0.55 -2.1" rot="0.0 -180.0 0.0" type="area" color="1 .1 .1" size="0.2 0.1" unshadowed="0.2" glare="0.2"/>
+				-->
+				<!--
+				Locations are used for certain functions that is not actual objects in the scene.
+				-->
+				<!--
+				The 'tags' property ('exhaust') of this location indicates that vehicle exhaust will emit from this point. 
+				-->
+				<location tags="exhaust" pos="0.5 0.1 -2.1" rot="-180.0 360.0 -180.0"/>
+				<!-- 
+				The 'tags' property ('vital') of this location indicates that this is a vital part of the vehicle, and the vehicle will be completely unusable if it is destroyed. 
+				-->
+				<location tags="vital" pos="0.00 0.0 0.0" rot="0.0 0.0 0.0"/>
+				<!-- 
+				The 'tags' property ('player') of this location indicates that this is the location of the camera when the player is in the vehicle. 
+				-->
+				<location tags="player" pos="0.0 0.0 0.0" rot="0.0 0.0 0.0"/>
+			</vox>
+			<!-- 
+			Wheels are used to define the wheels of a vehicle. 
+			The 'name' property of this 'wheel' has no functional implication, but indicates that this is the back left wheel.
+			The 'pos' property sets it's position relative to its parent, in this case the body on line 56.
+			The 'drive' property sets how much of the engine power is applied to this wheel. Normaly in the range 0.0-1.0.
+			The 'travel' property sets the suspension travel distance from its normal position along the y axis.
+			-->
+			<wheel name="bl" pos="-0.7 0.0 1.00" drive="1" travel="-0.1 0.1">
+				<!--
+				This is the actual vox shape used for the wheel.
+				-->
+				<vox pos="0.0 -0.34 0" rot="0.0 0.0 0.0" file="LEVEL/bike.vox" object="wheel_bl"/>
+			</wheel>
+			<wheel name="fl" pos="-0.7 0.0 -1.00" drive="1" steer="0.7" travel="-0.1 0.1">
+				<vox pos="0.0 -0.34 0" rot="0 0 0" file="LEVEL/bike.vox" object="wheel_bl"/>
+			</wheel>	
+			<wheel name="br" pos="0.5 0.0 1.00" drive="1" travel="-0.1 0.1">
+				<!--
+				This is the actual vox shape used for the wheel.
+				-->
+				<vox pos="0.0 -0.34 0" rot="0.0 0.0 0.0" file="LEVEL/bike.vox" object="wheel_bl"/>
+			</wheel>
+			<wheel name="fr" pos="0.5 0.0 -1.00" drive="1" steer="0.7" travel="-0.1 0.1">
+				<vox pos="0.0 -0.34 0" rot="0 0 0" file="LEVEL/bike.vox" object="wheel_bl"/>
+			</wheel>			
+		</body>
+	</vehicle>
+	<vehicle name="suv2" pos="40.7 0.2 -32.0" rot="0.0 0.0 0.0" driven="false" sound="suv2" spring="0.8" damping="0.8" topspeed="60" acceleration="2" strength="5" antispin="0" antiroll="0.2" difflock="0.5" steerassist="0.0">
+		<body pos="-0.05 0.6 -0.25" rot="0.0 0.0 0.0" dynamic="true">
+			<vox pos="0.05 -0.2 0.25" rot="0 180 0" density="2" strength="3" file="LEVEL/suv2.vox" object="body">
+				<light pos="0.75 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.1 0.1" unshadowed="0.3"/>
+				<light pos="-0.65 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.1 0.1" unshadowed="0.3"/>
+				<light pos="0.05 1.55 -2.1" rot="0.0 -180.0 0.0" type="area" color="1 .1 .1" size="0.3 0.1" unshadowed="0.2" glare="0.2"/>
+				<light pos="0.65 0.65 2.1" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="30" angle="90" penumbra="30" size="0.1" unshadowed="0.2" glare="0.35"/>
+				<light pos="-0.55 0.65 2.1" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="30" angle="90" penumbra="30" size="0.1" unshadowed="0.2" glare="0.35"/>
+				<location tags="exhaust" pos="0.5 0.05 -2.1" rot="-180.0 360.0 -180.0"/>
+				<location tags="vital" pos="0.05 0.55 1.4" rot="-180.0 360.0 -180.0"/>
+				<location tags="player" pos="0.35 1.25 0.25" rot="0.0 0.0 0.0"/>
+			</vox>
+			<wheel name="bl" pos="-0.65 -0.15 1.4" drive="1" travel="-0.1 0.2">
+				<vox pos="-0.1 -0.45 -0.05" rot="0.0 -180.0 0.0" file="LEVEL/suv2.vox" object="wheel_bl"/>
+			</wheel>
+			<wheel name="br" pos="0.65 -0.15 1.4" drive="1" travel="-0.1 0.2">
+				<vox pos="0.1 -0.45 -0.05" rot="0 180 0" file="LEVEL/suv2.vox" object="wheel_br"/>
+			</wheel>
+			<wheel name="fl" pos="-0.75 -0.15 -1.4" drive="1" steer="1" travel="-0.1 0.2">
+				<vox pos="0.0 -0.45 -0.05" rot="0 180 0" file="LEVEL/suv2.vox" object="wheel_fl"/>
+			</wheel>
+			<wheel name="fr" pos="0.65 -0.15 -1.4" drive="1" steer="1" travel="-0.1 0.2">
+				<vox pos="0.1 -0.45 -0.05" rot="0 180 0" file="LEVEL/suv2.vox" object="wheel_fr"/>
+			</wheel>
+		</body>
+	</vehicle>
+	<!--
+	The following vehicles work as the one described above.
+	-->
+	<vehicle tags="yellowvan" name="van1_yellow" pos="-2.9 0.2 0.4" rot="0.0 171.0 0.0" driven="false" sound="van" spring="0.5" damping="0.7" topspeed="70" acceleration="4" strength="2" antispin="1" antiroll="0.25" steerassist="0.0">
+		<body pos="-0.1 0.8 -0.4" rot="0.0 0.0 0.0" dynamic="true">
+			<vox pos="0.05 -0.5 0.2" rot="0.0 180.0 0.0" density="1.2" strength="2" file="LEVEL/van1_yellow.vox" object="body">
+				<location tags="exhaust" pos="-0.5 0.1 -2.5" rot="0.0 180.0 0.0"/>
+				<light pos="0.95 1.2 -2.5" rot="180.0 0.0 180.0" type="area" color="1 .1 .1" size="0.1 0.2" unshadowed="0.3" glare="0.2"/>
+				<light pos="0.95 1.0 -2.5" rot="180.0 0.0 180.0" type="area" size="0.1 0.2" unshadowed="0.3"/>
+				<light pos="-0.85 1.2 -2.5" rot="180.0 0.0 180.0" type="area" color="1 .1 .1" size="0.1 0.2" unshadowed="0.3" glare="0.2"/>
+				<light pos="-0.85 1.0 -2.5" rot="180.0 0.0 180.0" type="area" size="0.1 0.2" unshadowed="0.3"/>
+				<light pos="-0.75 0.95 2.4" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="20" angle="90" penumbra="30" size="0.1" unshadowed="0.3" glare="0.3"/>
+				<light pos="0.85 0.95 2.4" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="20" angle="90" penumbra="30" size="0.1" unshadowed="0.3" glare="0.3"/>
+				<location tags="vital" pos="0.05 0.75 1.9"/>
+				<location tags="player" pos="0.5 1.6 0.9" rot="0.0 0.0 0.0"/>
+			</vox>			
+			<wheel name="bl" pos="-0.75 -0.45 1.75" drive="0" travel="-0.1 0.2">
+				<vox pos="-0.1 -0.35 -0.05" rot="0.0 180.0 0.0" file="LEVEL/van1_yellow.vox" object="wheel_bl"/>
+			</wheel>
+			<wheel name="br" pos="0.8 -0.45 1.75" drive="0" travel="-0.1 0.2">
+				<vox pos="0.15 -0.35 -0.05" rot="0.0 180.0 0.0" file="LEVEL/van1_yellow.vox" object="wheel_br"/>
+			</wheel>
+			<wheel name="fl" pos="-0.75 -0.45 -1.65" drive="1" steer="1" travel="-0.1 0.2">
+				<vox pos="-0.1 -0.35 -0.05" rot="0.0 180.0 0.0" file="LEVEL/van1_yellow.vox" object="wheel_fl"/>
+			</wheel>
+			<wheel name="fr" pos="0.75 -0.45 -1.65" drive="1" steer="1" travel="-0.1 0.2">
+				<vox pos="0.2 -0.35 -0.05" rot="0.0 -180.0 0.0" file="LEVEL/van1_yellow.vox" object="wheel_fr"/>
+			</wheel>
+		</body>
+		<vox pos="-0.15 1 2.5" rot="0.0 0.0 0.0" density="1.2" strength="2" file="LEVEL/van1_yellow.vox" object="moveable" prop="true">		
+			<joint tags="mousehinge" pos="0 1.4 0" rot="0 -90.0 00.0" type="hinge" size="0.2" rotstrength="0.5" rotspring="0" sound="true">
+				<!--<voxbox name="joint visualizer" pos="-0.05 -0.05 -0.05" prop="true" collide="false" size="2 2 2" color="1 0.0 0.0"/>-->
+			</joint>
+		</vox>
+	</vehicle>
+	<vehicle name="salooncar" pos="47.8 0.2 8.9" rot="0.0 8.0 0.0" driven="false" sound="small1 0.8" spring="1.0" damping="1.5" topspeed="90" acceleration="6" strength="4" antiroll="0.2" difflock="0.2" steerassist="0.4" friction="1.8">
+		<body pos="0.0 0.4 -0.15" rot="0.0 0.0 0.0" dynamic="true">
+			<vox pos="0.05 -0.3 0.15" rot="0 180 0" density="1.2" strength="2" file="LEVEL/salooncar.vox" object="body">
+				<light pos="0.6 0.65 -2.1" rot="0 180 0" type="area" color="1 .1 .1" size="0.2 0.1" unshadowed="0.3" glare="0.2"/>
+				<light pos="0.75 0.65 -2.1" rot="0 180 0" type="area" size="0.1 0.1" unshadowed="0.3"/>
+				<light pos="-0.65 0.65 -2.1" rot="0 180 0" type="area" size="0.1 0.1" unshadowed="0.3"/>
+				<light pos="-0.5 0.65 -2.1" rot="0 180 0" type="area" color="1 .1 .1" size="0.2 0.1" unshadowed="0.3" glare="0.2"/>
+				<light pos="-0.5 0.55 2.1" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="20" angle="90" penumbra="30" size="0.1" unshadowed="0.2" glare="0.3"/>
+				<light pos="0.6 0.55 2.1" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="20" angle="90" penumbra="30" size="0.1" unshadowed="0.2" glare="0.3"/>
+				<location tags="exhaust" pos="0.45 0.15 -2.05" rot="180.0 0.0 180.0"/>
+				<location tags="vital" pos="0.05 0.55 1.35" rot="180.0 0.0 180.0"/>
+				<location tags="player" pos="0.35 1.15 0.1" rot="0.0 0.0 0.0"/>
+			</vox>
+			<wheel name="bl" pos="-0.65 -0.1 1.45" drive="1" travel="-0.1 0.1">
+				<vox pos="-0.1 -0.3 0.0" rot="0.0 180.0 0.0" file="LEVEL/salooncar.vox" object="wheel_bl"/>
+			</wheel>
+			<wheel name="br" pos="0.65 -0.1 1.45" drive="1" travel="-0.1 0.1">
+				<vox pos="0.1 -0.3 0.0" rot="0.0 -180.0 0.0" file="LEVEL/salooncar.vox" object="wheel_br"/>
+			</wheel>
+			<wheel name="fl" pos="-0.65 -0.1 -1.15" rot="0.0 0.0 0.0" drive="0" steer="1" travel="-0.1 0.1">
+				<vox pos="-0.1 -0.3 0.0" rot="0.0 180.0 0.0" file="LEVEL/salooncar.vox" object="wheel_fl"/>
+			</wheel>
+			<wheel name="fr" pos="0.65 -0.1 -1.15" drive="0" steer="1" travel="-0.1 0.1">
+				<vox pos="0.1 -0.3 0.0" rot="0.0 -180.0 0.0" file="LEVEL/salooncar.vox" object="wheel_fr"/>
+			</wheel>
+		</body>
+	</vehicle>
+	<vehicle tags="technicalVehicle" name="technical2" pos="0 0 5" rot="0.0 0.0 0.0" driven="false" sound="suv2" spring="0.8" damping="0.8" topspeed="60" acceleration="2" strength="5" antispin="0" antiroll="0.2" difflock="0.5" steerassist="0.0">
+		<body tags="technicalBody" pos="-0.05 0.6 -0.25" rot="0.0 0.0 0.0" dynamic="true">
+			<vox pos="0.05 -0.2 0.25" rot="0 180 0" density="2" strength="3" file="LEVEL/technical_2.vox" object="body">
+				<light pos="0.75 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.1 0.1" unshadowed="0.3"/>
+				<light pos="-0.65 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.1 0.1" unshadowed="0.3"/>
+				<light pos="0.65 0.65 2.1" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="30" angle="90" penumbra="30" size="0.1" unshadowed="0.2" glare="0.35"/>
+				<light pos="-0.55 0.65 2.1" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="30" angle="90" penumbra="30" size="0.1" unshadowed="0.2" glare="0.35"/>
+				<location tags="exhaust" pos="0.5 0.05 -2.1" rot="-180.0 360.0 -180.0"/>
+				<location tags="vital" pos="0.05 0.55 1.4" rot="-180.0 360.0 -180.0"/>
+				<location tags="player" pos="0.35 1.25 0.25" rot="0.0 0.0 0.0"/>
+				
+				<vox tags = "canon interact=canon" density="1.2" pos="0 1.8 -.9" strength="2" rot="0.0 0 0.0"  file="LEVEL/technical_2.vox" object="MG" prop="true">					
+
+				<joint tags="gunMount" pos="0.05  0 -.7" rot="90 0 0.0" type="hinge" size="0.5" rotstrength="0.1" rotspring="0" sound="true">
+					
+				</joint>	
+				</vox>
+			<vox pos="0.00 .4 -2.7" rot="0 0 0" density="2" strength="3" file="LEVEL/technical_2.vox" object="boot" prop="true">
+								<joint  pos="0.0 0 0" rot="0 -90 0.0" type="hinge" size="0.1" rotstrength="0.1" rotspring="0" limits="0 100" sound="true">
+					
+				</joint>	
+
+				</vox>
+			
+			</vox>			
+			
+			<vox tags = "rocketAmmo interact=UseRockets" density="1.2" pos="-.15 .5 1.4" strength="2" rot="0.0 0 0.0"  file="LEVEL/technical_2.vox" object="RocketBox" prop="true">
+								<joint  pos="0.0 0 0" rot="0 -90 0.0" type="hinge" size="0.5" rotstrength="1" rotspring="0" limits="-5 5" sound="true">
+					
+				</joint>	
+			</vox>	
+			<vox tags = "mgAmmo interact=UseBullets" density="1.2" pos=".42 .5 1.4" strength="2" rot="0.0 180 0.0"  file="LEVEL/technical_2.vox" object="dshkAmmo" prop="true">
+								<joint  pos="0.0 0 0" rot="0 -90 0.0" type="hinge" size="0.5" rotstrength="1" rotspring="0" limits="-5 5" sound="true">
+					
+				</joint>	
+			</vox>	
+			<wheel name="bl" pos="-0.65 -0.15 1.9" drive="1" travel="-0.1 0.2">
+				<vox pos="-0.1 -0.45 -0.05" rot="0.0 -180.0 0.0" file="LEVEL/technical_2.vox" object="wheel_bl"/>
+			</wheel>
+			<wheel name="br" pos="0.65 -0.15 1.9" drive="1" travel="-0.1 0.2">
+				<vox pos="0.1 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical_2.vox" object="wheel_br"/>
+			</wheel>
+			<wheel name="fl" pos="-0.75 -0.15 -1.4" drive="1" steer="1" travel="-0.1 0.2">
+				<vox pos="0.0 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical_2.vox" object="wheel_fl"/>
+			</wheel>
+			<wheel name="fr" pos="0.65 -0.15 -1.4" drive="1" steer="1" travel="-0.1 0.2">
+				<vox pos="0.1 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical_2.vox" object="wheel_fr"/>
+			</wheel>w
+		</body>
+	</vehicle>
+
+
+
+<!--
+
+					default configed technial vehicle without any linked scripts
+-->
+	<vehicle tags="mountedGunVehicle" name="technical" pos="5 0 0" rot="0.0 0.0 0.0" driven="false" sound="suv2" spring="0.8" damping="0.8" topspeed="60" acceleration="2" strength="5" antispin="0" antiroll="0.2" difflock="0.5" steerassist="0.0">
+		<body tags="mountedGunVehicleBody" pos="-0.05 0.6 -0.25" rot="0.0 0.0 0.0" dynamic="true">
+			<vox pos="0.05 -0.2 0.25" rot="0 180 0" density="2" strength="3" file="LEVEL/technical.vox" object="body">
+				<light pos="0.75 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.1 0.1" unshadowed="0.3"/>
+				<light pos="-0.65 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.1 0.1" unshadowed="0.3"/>
+				<light pos="0.65 0.65 2.1" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="30" angle="90" penumbra="30" size="0.1" unshadowed="0.2" glare="0.35"/>
+				<light pos="-0.55 0.65 2.1" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="30" angle="90" penumbra="30" size="0.1" unshadowed="0.2" glare="0.35"/>
+				<location tags="exhaust" pos="0.5 0.05 -2.1" rot="-180.0 360.0 -180.0"/>
+				<location tags="vital" pos="0.05 0.55 1.4" rot="-180.0 360.0 -180.0"/>
+				<location tags="player" pos="0.35 1.25 0.25" rot="0.0 0.0 0.0"/>
+				
+				<vox tags = "mountedGunVox interact=mountedGun" density="1.2" pos="0 1.8 -.9" strength="2" rot="0.0 0 0.0"  file="LEVEL/technical.vox" object="MG" prop="true">				
+				<joint tags="mountedGunJoint" pos="0.05  0 -.7" rot="90 0 0.0" type="hinge" size="0.5" rotstrength="0.1" rotspring="0" sound="true">
+				</joint>	
+				</vox>
+			<vox pos="0.00 .4 -2.7" rot="0 0 0" density="2" strength="3" file="LEVEL/technical.vox" object="boot" prop="true">
+								<joint  pos="0.0 0 0" rot="0 -90 0.0" type="hinge" size="0.1" rotstrength="0.1" rotspring="0" limits="0 100" sound="true">
+				</joint>	
+
+				</vox>
+			</vox>			
+			<vox tags = "rocketbox interact=UseRockets" density="1.2" pos="-.15 .5 1.4" strength="2" rot="0.0 0 0.0"  file="LEVEL/technical.vox" object="RocketBox" prop="true">
+								<joint  pos="0.0 0 0" rot="0 -90 0.0" type="hinge" size="0.5" rotstrength="1" rotspring="0" limits="-5 5" sound="true">
+				</joint>	
+			</vox>	
+			<vox tags = "mgbox interact=UseBullets" density="1.2" pos=".42 .5 1.4" strength="2" rot="0.0 180 0.0"  file="LEVEL/technical.vox" object="dshkAmmo" prop="true">
+								<joint  pos="0.0 0 0" rot="0 -90 0.0" type="hinge" size="0.5" rotstrength="1" rotspring="0" limits="-5 5" sound="true">
+				</joint>	
+			</vox>	
+			<wheel name="bl" pos="-0.65 -0.15 1.9" drive="1" travel="-0.1 0.2">
+				<vox pos="-0.1 -0.45 -0.05" rot="0.0 -180.0 0.0" file="LEVEL/technical.vox" object="wheel_bl"/>
+			</wheel>
+			<wheel name="br" pos="0.65 -0.15 1.9" drive="1" travel="-0.1 0.2">
+				<vox pos="0.1 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical.vox" object="wheel_br"/>
+			</wheel>
+			<wheel name="fl" pos="-0.75 -0.15 -1.4" drive="1" steer="1" travel="-0.1 0.2">
+				<vox pos="0.0 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical.vox" object="wheel_fl"/>
+			</wheel>
+			<wheel name="fr" pos="0.65 -0.15 -1.4" drive="1" steer="1" travel="-0.1 0.2">
+				<vox pos="0.1 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical.vox" object="wheel_fr"/>
+			</wheel>
+		</body>
+	</vehicle>
+
+
+	<vehicle tags="technicalVehicleSPG" name="SPGVehicle" pos="-5 0 0" rot="0.0 0.0 0.0" driven="false" sound="suv2" spring="0.8" damping="0.8" topspeed="60" acceleration="2" strength="5" antispin="0" antiroll="0.2" difflock="0.5" steerassist="0.0">
+		<body tags="technicalBodySPG" pos="-0.05 0.6 -0.25" rot="0.0 0.0 0.0" dynamic="true">
+			<vox pos="0.05 -0.2 0.25" rot="0 180 0" density="2" strength="3" file="LEVEL/technical.vox" object="body">
+				<light pos="0.75 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.1 0.1" unshadowed="0.3"/>
+				<light pos="-0.65 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.1 0.1" unshadowed="0.3"/>
+				<light pos="0.65 0.65 2.1" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="30" angle="90" penumbra="30" size="0.1" unshadowed="0.2" glare="0.35"/>
+				<light pos="-0.55 0.65 2.1" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="30" angle="90" penumbra="30" size="0.1" unshadowed="0.2" glare="0.35"/>
+				<location tags="exhaust" pos="0.5 0.05 -2.1" rot="-180.0 360.0 -180.0"/>
+				<location tags="vital" pos="0.05 0.55 1.4" rot="-180.0 360.0 -180.0"/>
+				<location tags="player" pos="0.35 1.25 0.25" rot="0.0 0.0 0.0"/>
+				
+				<vox tags = "SPG interact=mountedGun" density="1.2" pos="0 1.8 -1.1" strength="2" rot="0.0 0 0.0"  file="LEVEL/technical.vox" object="SPG9" prop="true">				
+				<joint tags="SPGgunMount" pos="0.05  0 -.5" rot="90 0 0.0" type="hinge" size="0.5" rotstrength="0.1" rotspring="0" sound="true">
+				</joint>	
+				</vox>
+			<vox pos="0.00 .4 -2.7" rot="0 0 0" density="2" strength="3" file="LEVEL/technical.vox" object="boot" prop="true">
+								<joint  pos="0.0 0 0" rot="0 -90 0.0" type="hinge" size="0.1" rotstrength="0.1" rotspring="0" limits="0 100" sound="true">
+				</joint>	
+
+				</vox>
+			</vox>			
+			<vox tags = "SPGBox interact=UseRockets" density="1.2" pos="-.15 .5 1.4" strength="2" rot="0.0 0 0.0"  file="LEVEL/technical.vox" object="RocketBox" prop="true">
+								<joint  pos="0.0 0 0" rot="0 -90 0.0" type="hinge" size="0.5" rotstrength="1" rotspring="0" limits="-5 5" sound="true">
+				</joint>	
+			</vox>	
+		
+			<wheel name="bl" pos="-0.65 -0.15 1.9" drive="1" travel="-0.1 0.2">
+				<vox pos="-0.1 -0.45 -0.05" rot="0.0 -180.0 0.0" file="LEVEL/technical.vox" object="wheel_bl"/>
+			</wheel>
+			<wheel name="br" pos="0.65 -0.15 1.9" drive="1" travel="-0.1 0.2">
+				<vox pos="0.1 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical.vox" object="wheel_br"/>
+			</wheel>
+			<wheel name="fl" pos="-0.75 -0.15 -1.4" drive="1" steer="1" travel="-0.1 0.2">
+				<vox pos="0.0 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical.vox" object="wheel_fl"/>
+			</wheel>
+			<wheel name="fr" pos="0.65 -0.15 -1.4" drive="1" steer="1" travel="-0.1 0.2">
+				<vox pos="0.1 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical.vox" object="wheel_fr"/>
+			</wheel>
+		</body>
+	</vehicle>
+
+
+	<vehicle tags="technicalVehicleZU23" name="ZU23Vehicle" pos="-5 0 10" rot="0.0 0.0 0.0" driven="false" sound="suv2" spring="0.8" damping="0.8" topspeed="60" acceleration="2" strength="5" antispin="0" antiroll="0.2" difflock="0.5" steerassist="0.0">
+		<body tags="technicalBodyZU23" pos="-0.05 .6 -0.25" rot="0.0 0.0 0.0" dynamic="true">
+			<vox pos="0.05 -0.2 0.25" rot="0 180 0" density="2" strength="3" file="LEVEL/technical_zu23.vox" object="body">
+				<light pos="0.75 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.1 0.1" unshadowed="0.3"/>
+				<light pos="-0.65 0.55 -2.1" rot="0.0 180.0 0.0" type="area" size="0.1 0.1" unshadowed="0.3"/>
+				<light pos="0.65 0.65 2.1" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="30" angle="90" penumbra="30" size="0.1" unshadowed="0.2" glare="0.35"/>
+				<light pos="-0.55 0.65 2.1" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="30" angle="90" penumbra="30" size="0.1" unshadowed="0.2" glare="0.35"/>
+				<location tags="exhaust" pos="0.5 0.05 -2.1" rot="-180.0 360.0 -180.0"/>
+				<location tags="vital" pos="0.05 0.55 1.4" rot="-180.0 360.0 -180.0"/>
+				<location tags="player" pos="0.35 1.25 0.25" rot="0.0 0.0 0.0"/>
+				
+				<vox tags = "ZU23 interact=mountedGun" density="1.2" pos="0 1 -3.5" strength="2" rot="0.0 180.0 0"  file="LEVEL/technical_zu23.vox" object="ZU23" prop="true">				
+				<joint tags="ZU23gunMount" pos="0.05  0 -1.5" rot="90 0 0.0" type="hinge" size="0.5" rotstrength="0.1" rotspring="0" sound="true">
+						<voxbox name="joint visualizer" pos="-0.05 -0.05 -0.05" prop="true" collide="false" size="2 2 2" color="1 0.0 0.0"/>
+				</joint>	
+				</vox>
+			</vox>			
+			
+		
+			<wheel name="bl" pos="-0.65 -0.15 1.9" drive="1" travel="-0.1 0.2">
+				<vox pos="-0.1 -0.45 -0.05" rot="0.0 -180.0 0.0" file="LEVEL/technical_zu23.vox" object="wheel_bl"/>
+			</wheel>
+			<wheel name="br" pos="0.65 -0.15 1.9" drive="1" travel="-0.1 0.2">
+				<vox pos="0.1 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical_zu23.vox" object="wheel_br"/>
+			</wheel>
+			<wheel name="fl" pos="-0.75 -0.15 -1.4" drive="1" steer="1" travel="-0.1 0.2">
+				<vox pos="0.0 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical_zu23.vox" object="wheel_fl"/>
+			</wheel>
+			<wheel name="fr" pos="0.65 -0.15 -1.4" drive="1" steer="1" travel="-0.1 0.2">
+				<vox pos="0.1 -0.45 -0.05" rot="0 180 0" file="LEVEL/technical_zu23.vox" object="wheel_fr"/>
+			</wheel>
+		</body>
+	</vehicle>
+
+	<vehicle tags="bmp1_1" name="bmp1" pos="10.0 0.0 0.0" rot="0.0 0.0 0.0" driven="false" sound="dumptruck" spring="1.2" damping="1.0" topspeed="60" acceleration="2" strength="16" antispin="1" antiroll="0.1" difflock="1" steerassist="0.3" friction="1.3">
+		<!-- Center of mass, 0.0 0.0 0.0 is the center of the vehicle at the lowest point -->
+		<body tags="bmp1Body" pos="0.0 0.0 0.0" rot="0.0 0.0 0.0" dynamic="true">
+			<!-- Position of the body, relative to the center of mass -->
+			<vox pos="0.0 0.1 0.0" rot="0 0 0" density="20" strength="5" file="LEVEL/bmp1.vox" object="body">
+			
+				<!-- Front lights -->
+				<light pos="2 2.2 -4.8" rot="0.0 180.0 0.0"  type="cone" color="1 .9 .8" scale="20" angle="50" penumbra="15" size="0.1" unshadowed="0.2" glare="0.4"/>
+				<light pos="-2 2.2 -4.8" rot="0.0 180.0 0.0" type="cone" color="1 .9 .8" scale="20" angle="50" penumbra="15" size="0.1" unshadowed="0.2" glare="0.4"/>
+
+				<!-- Rear Lights -->
+				<light pos="1.85 2.05 4.75" rot="0.0 0.0 0.0" type="area" color="1 .1 .1" size="0.2 0.1" unshadowed="0.2" glare="0.2"/>
+				<light pos="-1.85 2.05 4.75" rot="0.0 0.0 0.0" type="area" color="1 .1 .1" size="0.2 0.1" unshadowed="0.2" glare="0.2"/>
+				
+				<!-- Exhaust -->
+				<location tags="exhaust" pos="1.6 2.7 -1.0" rot="-25 -70 0 "/>
+				<location tags="exhaust" pos="1.7  2.7 -1.5" rot="-45 -70 0 "/>
+				<location tags="exhaust" pos="1.7  2.7 -1.5" rot="-25 -90 0 "/>
+				<location tags="exhaust" pos="1.6  2.7 -1.2" rot="-45 -90 0 "/>
+				<location tags="exhaust" pos="1.6  2.7 -1.0" rot="-45 -90 0 "/>
+				
+				<!-- Player Camera -->
+				<location tags="player" pos="-1  2.7 -2.1" rot="0.0 0.0 0.0"/>
+
+
+				<vox tags = "bmp1Turret interact=mountedGun" density="1.2" pos="0 2.6 -1" strength="2" rot="0.0 180 0"  file="LEVEL/bmp1.vox" object="turret" prop="true">	
+
+
+				<light pos="-.7 1.05 -1" rot="0.0 0.0 0.0" type="cone" color="1 .9 .8" scale="50" angle="50" penumbra="50" size="0.1" unshadowed="0.2" glare="0.4"/>			
+				
+				<joint tags="bmp1TurretMount" pos="0.0  0 -1.5" rot="90 0 0" type="hinge" size="0.5" rotstrength="0.1" rotspring="0" sound="true">
+						<!-- <voxbox name="joint visualizer" pos="-0.05 -0.05 -0.05" prop="true" collide="false" size="2 2 2" color="1 0.0 0.0"/> -->
+				</joint>	
+				</vox>
+
+
+				<vox  density="1.2" pos="-.8  1.1 4.75" strength="2" rot="0.0 0 0"  file="LEVEL/bmp1.vox" object="leftRearDoor" prop="true">				
+				<joint  pos="-0.5  .7 0" rot="90 0 0" type="hinge" size="0.5" rotstrength="0.1" rotspring="0" limits="0 130" sound="true">
+						<!-- <voxbox name="joint visualizer" pos="-0.05 -0.05 -0.05" prop="true" collide="false" size="2 2 2" color="1 0.0 0.0"/> -->
+				</joint>	
+				</vox>
+
+				<vox  density="1.2" pos=".8  1.1 4.75" strength="2" rot="0.0 0 0"  file="LEVEL/bmp1.vox" object="rightRearDoor" prop="true">				
+				<joint  pos="0.5  .7 0" rot="-90 0 0" type="hinge" size="0.5" rotstrength="0.1" rotspring="0" limits="0 130" sound="true">
+						<!-- <voxbox name="joint visualizer" pos="-0.05 -0.05 -0.05" prop="true" collide="false" size="2 2 2" color="1 0.0 0.0"/> -->
+				</joint>	
+				</vox>
+			</vox>
+
+
+				<vox  density="1.2" pos="-.7  2.65 4.25" strength="2" rot="0.0 0 0"  file="LEVEL/bmp1.vox" object="rrh1" prop="true">				
+				<joint  pos="0.5  .1 0" rot="180 0  0 " type="hinge" size="0.5" rotstrength="0.1" rotspring="0"  limits="0 110" sound="true">
+						<!-- <voxbox name="joint visualizer" pos="-0.05 -0.05 -0.05" prop="true" collide="false" size="2 2 2" color="1 0.0 0.0"/> -->
+				</joint>	
+				</vox>
+
+
+				<vox  density="1.2" pos="-.7  2.7 3.2" strength="2" rot="0.0 0 0"  file="LEVEL/bmp1.vox" object="rrh2" prop="true">				
+				<joint  pos="0.5  .1 0" rot="180 0  0 " type="hinge" size="0.5" rotstrength="0.1" rotspring="0"  limits="0 110" sound="true">
+						<!-- <voxbox name="joint visualizer" pos="-0.05 -0.05 -0.05" prop="true" collide="false" size="2 2 2" color="1 0.0 0.0"/> -->
+				</joint>	
+				</vox>
+
+				<vox  density="1.2" pos=".7  2.65 4.25" strength="2" rot="0.0 0 0"  file="LEVEL/bmp1.vox" object="rlh1" prop="true">				
+				<joint  pos="-0.5  .1 0" rot="0 0  0 " type="hinge" size="0.5" rotstrength="0.1" rotspring="0"  limits="0 110" sound="true">
+						<!-- <voxbox name="joint visualizer" pos="-0.05 -0.05 -0.05" prop="true" collide="false" size="2 2 2" color="1 0.0 0.0"/> -->
+				</joint>	
+				</vox>
+
+
+				<vox  density="1.2" pos=".7  2.7 3.2" strength="2" rot="0.0 0 0"  file="LEVEL/bmp1.vox" object="rlh2" prop="true">				
+				<joint  pos="-0.5  .1 0" rot="00  0 " type="hinge" size="0.5" rotstrength="0.1" rotspring="0"  limits="0 110" sound="true">
+						<!-- <voxbox name="joint visualizer" pos="-0.05 -0.05 -0.05" prop="true" collide="false" size="2 2 2" color="1 0.0 0.0"/> -->
+				</joint>	
+				</vox>
+
+
+
+				<vox  density="1.2" pos="-1.05  2.63 -2.13" strength="2" rot="0.0 0 0"  file="LEVEL/bmp1.vox" object="frontHatch" prop="true">				
+				<joint  pos="0.4  0 0" rot="-90 00  0 " type="hinge" size="0.5" rotstrength="0.1" rotspring="0"  limits="0 150" sound="true">
+						<!-- <voxbox name="joint visualizer" pos="-0.05 -0.05 -0.05" prop="true" collide="false" size="2 2 2" color="1 0.0 0.0"/> -->
+				</joint>	
+				</vox>
+
+			<wheel name="6r" pos="1.5 0.7 -2.6" drive="1" steer="0.33" travel="-0.1 0.1">
+				<vox pos="0.5 -0.55 -0.05" rot="0.0 0.0 0.0" file="LEVEL/bmp1.vox" object="whr6"/>
+			</wheel>
+			<wheel name="1r" pos="1.5 0.60 -1.45" drive="1" steer="1.0" travel="-0.1 0.1">
+				<vox pos="0.5 -0.55 -0.05" rot="0.0 0.0 0.0" file="LEVEL/bmp1.vox" object="whr1"/>
+			</wheel>
+			<wheel name="2r" pos="1.50 0.6 -0.25" drive="1" steer="0.66" travel="-0.1 0.1">
+				<vox pos="0.5 -0.55 -0.05" rot="0.0 0.0 0.0" file="LEVEL/bmp1.vox" object="whr2"/>
+			</wheel>
+			<wheel name="3r" pos="1.50 0.6 1" drive="1" steer="0.33" travel="-0.1 0.1">
+				<vox pos="0.5 -0.55 -0.05" rot="0.0 0.0 0.0" file="LEVEL/bmp1.vox" object="whr3"/>
+			</wheel>
+			<wheel name="4r" pos="1.50 0.6 2.25" drive="1" steer="0.33" travel="-0.1 0.1">
+				<vox pos="0.5 -0.55 -0.05" rot="0.0 0.0 0.0" file="LEVEL/bmp1.vox" object="whr4"/>
+			</wheel>
+			<wheel name="5r" pos="1.50 0.7 3.5" drive="1" steer="-0.33" travel="-0.1 0.1">
+				<vox pos="0.5 -0.55 -0.05" rot="0.0 0.0 0.0" file="LEVEL/bmp1.vox" object="whr5"/>
+			</wheel>
+
+			<wheel name="6l" pos="-1.5 0.7 -2.6" drive="1" steer="0.33" travel="-0.1 0.1">
+				<vox pos="-0.4 -0.55 -0.05" rot="0.0 -0.0 0.0" file="LEVEL/bmp1.vox" object="whl6"/>
+			</wheel>
+			<wheel name="1l" pos="-1.5 0.6 -1.45" drive="1" steer="1" travel="-0.1 0.1">
+				<vox pos="-0.4 -0.55 -0.05" rot="0.0 0.0 0.0" file="LEVEL/bmp1.vox" object="whl1"/>
+			</wheel>
+			<wheel name="2l" pos="-1.5 0.6 -0.25" drive="1" steer="0.66" travel="-0.1 0.1">
+				<vox pos="-0.4 -0.55 -0.05" rot="0.0 0.0 0.0" file="LEVEL/bmp1.vox" object="whl2"/>
+			</wheel>
+			<wheel name="3l" pos="-1.5 0.6 1" drive="1" steer="0.33" travel="-0.1 0.1">
+				<vox pos="-0.4 -0.55 -0.05" rot="0.0 0.0 0.0" file="LEVEL/bmp1.vox" object="whl3"/>
+			</wheel>
+			<wheel name="4l" pos="-1.5 0.6 2.25" drive="1" steer="0.33" travel="-0.1 0.1">
+				<vox pos="-0.4 -0.55 -0.05" rot="0.0 0.0 0.0" file="LEVEL/bmp1.vox" object="whl4"/>
+			</wheel>
+			<wheel name="5l" pos="-1.5 0.7 3.5" drive="1" steer="-0.33" travel="-0.1 0.1">
+				<vox pos="-0.4 -0.55 -0.05" rot="0.0 0.0 0.0" file="LEVEL/bmp1.vox" object="whl5"/>
+			</wheel>
+		</body>
+
+	</vehicle>
+	
+
+
+
+	<!-- 
+	The boundary is the orange grid which the player can not pass through. It is defined by a number of vertices.
+	-->
+	<boundary>
+		<!-- 
+		These vertices defines the boundary of the game level.
+		The 'pos' property sets the position of the vertex relative to the bottom center of the game world, in meters. As the boundary has infinite height the positions are only given relative to width and length, without height.
+		-->
+		<vertex pos="-100.0 -100.0"/>
+		<vertex pos="100.0 -100.0"/>
+		<vertex pos="100.0 100.0"/>
+		<vertex pos="-100.0 100.0"/>
+	</boundary>
+	<!-- 
+	This loads and runs the referenced script when the level starts.
+	The 'file' property is the reference to which script should be loaded and run. Since this file reference is not preceded by 'LEVEL/' it is loaded from the 'data/script' folder in the installation folder.
+	-->
+	<script file="main.lua"/>	
+	<script file="LEVEL/scripts/technicalMG.lua"/>	
+	<script file="LEVEL/scripts/technicalSPG.lua"/>	
+	<script file="LEVEL/scripts/technicalZU23.lua"/>
+	<script file="LEVEL/scripts/bmp1_armed.lua"/>				
+
+	
+</scene>
+
