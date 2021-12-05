@@ -1,0 +1,22 @@
+cfg=vehicle
+component=body
+component=chassis
+component=turret turretGroup=mainTurret
+component=turretJoint
+component=gun weaponType=2A46M group=primary  
+component=gunJoint
+
+
+add inside tags=""
+
+vehicle -> cfg=vehicle
+body -> component=body
+vox  (for vehicle body) -> component=chassis
+vox (for turret) -> component=turret turretGroup=mainTurret
+joint (for turret joint) ->component=turretJoint
+vox (for gun) -> component=gun weaponType=2A46M group=primary  
+vox (for gun joint) -> component=gunJoint
+
+
+
+component=gun weaponType=M10HowitzerRL group=primary   interact=mountedGun
