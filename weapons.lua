@@ -1759,56 +1759,54 @@ weapons = {
 					magazines 					= {
 											[1] = {
 													name = "9M55K",
-													magazineCapacity = 16,
+													magazineCapacity = 15,
 													ammoCount = 0,
-													magazineCount = 10,
+													magazineCount = 50,
 
 												},
 											},
 					loadedMagazine 			= 1,
 					barrels 				= 
 												{
-													[1] = {x=0.0,y=1.5,z=-0.6},
-													[2] = {x=0.3,y=1.5,z=-0.6},
-													[3] = {x=0.6,y=1.5,z=-0.6},
-													[4] = {x=0.9,y=1.5,z=-0.6},
-													[5] = {x=1.1,y=1.5,z=-0.6},
-													[6] = {x=1.5,y=1.5,z=-0.6},
-													[7] = {x=1.8,y=1.5,z=-0.6},
-													[8] = {x=2.2,y=1.5,z=-0.6},
-													[9] = {x=0.0,y=1.7,z=-0.6},
-													[10] = {x=0.3,y=1.7,z=-0.6},
-													[11] = {x=0.6,y=1.7,z=-0.6},
-													[12] = {x=0.8,y=1.7,z=-0.6},
-													[13] = {x=1.1,y=1.7,z=-0.6},
-													[14] = {x=0.4,y=1.7,z=-0.6},
-													[15] = {x=1.7,y=1.7,z=-0.6},
-													[16] = {x=2.2,y=1.7,z=-0.6},
+													[1] = {x=0.3,y=1.5,z=-0.6},
+													[2] = {x=0.9,y=1.5,z=-0.6},
+													[3] = {x=1.6,y=1.5,z=-0.6},
+													[4] = {x=2.3,y=1.5,z=-0.6},
+													[5] = {x=2.9,y=1.5,z=-0.6},
+													[6] = {x=0.3,y=0.9,z=-0.6},
+													[7] = {x=0.9,y=0.9,z=-0.6},
+													[8] = {x=1.6,y=0.9,z=-0.6},
+													[9] = {x=2.3,y=0.9,z=-0.6},
+													[10] = {x=2.9,y=0.9,z=-0.6},
+													[11] = {x=0.3,y=0.3,z=-0.6},
+													[12] = {x=0.9,y=0.3,z=-0.6},
+													[13] = {x=1.6,y=0.3,z=-0.6},
+													[14] = {x=2.3,y=0.3,z=-0.6},
+													[15] = {x=2.9,y=0.3,z=-0.6},
 												},
 					multiBarrel 			= 1,
 					backBlast				= 
 												{
-													[1] = {z=5.0,force=5},
-													[2] = {z=5.0,force=5},
-													[3] = {z=5.0,force=5},
-													[4] = {z=5.0,force=5},
-													[5] = {z=5.0,force=5},
-													[6] = {z=5.0,force=5},
-													[7] = {z=5.0,force=5},
-													[8] = {z=5.0,force=5},
-													[9] = {z=5.0,force=5},
-													[10] = {z=5.0,force=5},
-													[11] = {z=5.0,force=5},
-													[12] = {z=5.0,force=5},
-													[13] = {z=5.0,force=5},
-													[14] = {z=5.0,force=5},
-													[15] = {z=5.0,force=5},
-													[16] = {z=5.0,force=5},
+													[1] = {z=8.0,force=5},
+													[2] = {z=8.0,force=5},
+													[3] = {z=8.0,force=5},
+													[4] = {z=8.0,force=5},
+													[5] = {z=8.0,force=5},
+													[6] = {z=8.0,force=5},
+													[7] = {z=8.0,force=5},
+													[8] = {z=8.0,force=5},
+													[9] = {z=8.0,force=5},
+													[10] = {z=8.0,force=5},
+													[11] = {z=8.0,force=5},
+													[12] = {z=8.0,force=5},
+													[13] = {z=8.0,force=5},
+													[14] = {z=8.0,force=5},
+													[15] = {z=8.0,force=5},
 												},
 					sight					= {
 												[1] = {
 												x = 2.3,
-												y = 2.3,
+												y = 4.3,
 												z = 0.3,
 													},
 
@@ -1816,7 +1814,7 @@ weapons = {
 												},
 					canZoom					= true,
 					highVelocityShells		= true,
-					RPM 					= 150,
+					RPM 					= 140,
 					reload 					= 5,
 					recoil 					= 0.3,
 					dispersion 				= 30,
@@ -2149,6 +2147,60 @@ weapons = {
 				mouseDownSoundFile 		=	"MOD/sounds/lmgBurst0",
 
 				},
+
+--[[
+
+
+		smoke + the funny weapons
+
+
+]]
+
+	['fire_Hose'] = {
+					name 	= "Fire Hose",
+					caliber 				= 0.01,
+					weaponType 				= "special",
+					loadedMagazine 			= 1,
+					magazines 					= {
+											[1] = {
+													name = "foam",
+													magazineCapacity = 999,
+													ammoCount = 0,
+													magazineCount = 1000,
+												},
+											},
+
+				barrels 				= 
+											{
+												[1] = {x=0,y=0.2,z=-0.6},
+											},
+				multiBarrel 			= 1,
+
+				sight					= {
+												[1] = {
+											x = .25,
+											y = 2.,
+											z = 1.8,
+												},
+
+
+											},
+				canZoom					= false,
+				RPM 					= 900,
+				reload 					= 4,
+				magazineCapacity 		= 999,
+				recoil 					= 0.2,
+				dispersion 				= 6,
+				gunRange				= 3000,
+				smokeFactor 			= .2,
+				smokeMulti				= 2,
+				-- soundFile 				=	"MOD/sounds/HeavySingleShot",
+				-- mouseDownSoundFile 		=	"MOD/sounds/HeavyAutoFire",
+				loopSoundFile			= 	"tools/extinguisher-loop"--"MOD/sounds/HeavyAutoFire",
+				-- tailOffSound	 		=	"MOD/sounds/HeavySingleShot",				
+
+	},
+
 
 	["t90_smoke_turret"] = {
 				name 					= "Smoke Dischargers",

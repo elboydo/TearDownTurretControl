@@ -375,5 +375,6 @@ function AVF_ai:gunAngle(x,y,z,gun,targetPos)
 	local forward = TransformToParentVec(gunTransform, Vec(x,  y, z))
 	local orientationFactor = clamp(VecDot(forward, toPlayer) * 0.7 + 0.3, 0.0, 1.0)
 	-- DebugLine(gunTransform.pos,fwdPos,1,0,0,1)
+	local distance = VecLength()
 	return orientationFactor
 end

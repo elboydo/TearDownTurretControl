@@ -1301,20 +1301,22 @@ function fireControl(dt,gun,barrelCoords)
 	local body = GetShapeBody(gun.id)
 	-- utils.printStr("firing "..gun.name.."with "..munitions[gun.default].name.."\n"..body.." "..gun.id.." "..vehicle.body)
 	local barrelCoords = rectifyBarrelCoords(gun)
-	for i=1, gun.smokeMulti do
-		cannonSmoke(dt,gun,barrelCoords)
+	if(not gun.weaponType == "special") then 
+		for i=1, gun.smokeMulti do
+			cannonSmoke(dt,gun,barrelCoords)
 
-		
-		if(gun.backBlast) then
-			local backBlastLoc = barrelCoords
-			backBlast(dt,gun,backBlastLoc)
-		end
-		if(gun.cannonBlast) then
-			cannonBlast(gun,barrelCoords)
 			
-		end
+			if(gun.backBlast) then
+				local backBlastLoc = barrelCoords
+				backBlast(dt,gun,backBlastLoc)
+			end
+			if(gun.cannonBlast) then
+				cannonBlast(gun,barrelCoords)
+				
+			end
+			
 		
-	
+		end
 	end
 	
 	fire(gun,barrelCoords)
@@ -1817,7 +1819,12 @@ function fire(gun,barrelCoords)
 
 
 	if(not oldShoot)then
-		pushProjectile(barrelCoords,gun)
+		if(gun.weaponType =="special") then 
+			pushSpecial(barrelCoords,gun)
+			DebugWatch("USING",gun.name)
+		else
+			pushProjectile(barrelCoords,gun)
+		end
 	else 
 		local cannonLoc=  barrelCoords--rectifyBarrelCoords(gun)
 			QueryRejectBody(vehicle.body)
@@ -1901,6 +1908,59 @@ function payload_tank_he(shell,hitPos,hitTarget,test)
 	end
 
 end
+
+
+----
+
+---- specials
+
+-----
+
+function pushSpecial(barrelCoords,gun)
+	fireFoam(barrelCoords,gun)
+end
+
+
+
+function fireFoam(cannonLoc,gun)
+
+	local fwdPos = TransformToParentPoint(cannonLoc, Vec(0,-1,0))
+	local direction = VecSub(fwdPos, cannonLoc.pos)
+	local p = cannonLoc.pos
+
+	local shellType = gun.magazines[gun.loadedMagazine].CfgAmmo
+	local predictedBulletVelocity = VecScale(direction,shellType.velocity)
+
+	local q = 1.0 
+	for i=1, 64 do
+		
+		local v = VecAdd(VecScale(predictedBulletVelocity,rnd(7,14)/10),rndVec(shellType.velocity/5))---VecNormalize(direction)--rndVec(projectile.weaponClass.ammo.caliber*0.3)
+		local radius = 1
+		radius = rnd(radius/2,radius*2) *0.01
+		local stretch = rnd(-1,1)
+		local endStretch = rnd(-1,1)
+		local life = rnd(0.2, 0.7)*30
+		life = 0.5 + life*life*life * 0.7
+
+		local w = 0.8-q*0.6
+		local w2 = 1.0
+		local r = 0.5 *(0.5 + 0.5*q)
+		ParticleReset()
+		ParticleTile(2)
+		ParticleType("smoke")
+		ParticleCollide(0.1, 1)
+		ParticleFlags(256)
+		ParticleColor(w*(rnd(3,6)/10), w*(rnd(3,6)/10), w, w2*(rnd(4,6)/10), w2*(rnd(4,6)/10), w2)
+		ParticleRadius(0.5*r, r)
+		ParticleGravity(rnd(-2,-20))
+		ParticleDrag(0.01)
+		ParticleSticky(0.02)
+		ParticleAlpha(q, q, "constant", 0, 0.5)
+		SpawnParticle(p, v, rnd(3,5))
+
+	end
+end
+
 ---- 
 
 ---- PROJECTILE HANDLING
@@ -1954,15 +2014,76 @@ function pushProjectile(cannonLoc,gun)
 
 end
 
+function initClusterBomblets(parentProjectile)
+
+	for i=1,math.random(5,10) do
+		pushClusterProjectile(parentProjectile.flightPos,parentProjectile)
+		
+	end
+end
+
+
+function pushClusterProjectile(bombletPos,parentProjectile)
+	local fwdPos = TransformToParentPoint(bombletPos, Vec(0,-1,0))
+	local direction = VecSub(fwdPos, bombletPos.pos)
+	local point1 = bombletPos.pos
+	projectileHandler.shells[projectileHandler.shellNum] = deepcopy(projectileHandler.defaultShell)
+
+	local fwdPos = TransformToParentPoint(bombletPos, Vec(math.random(-10,10),-10,math.random(-10,10)))
+	local direction = VecSub( fwdPos,bombletPos.pos)
+	local point1 = bombletPos.pos
+	projectileHandler.shells[projectileHandler.shellNum] = deepcopy(projectileHandler.defaultShell)
+	local currentBomblet				= projectileHandler.shells[projectileHandler.shellNum] 
+	currentBomblet.active 			= true 
+	currentBomblet.shellType = deepcopy(parentProjectile.shellType)
+	--- bomblet specific
+	currentBomblet.shellType.payload = currentBomblet.shellType.bomblet.payload
+	currentBomblet.shellType.explosionSize = currentBomblet.shellType.bomblet.explosionSize  
+	currentBomblet.shellType.gravityCoef = currentBomblet.shellType.bomblet.gravityCoef
+	---
+	currentBomblet.cannonLoc 			= bombletPos
+	currentBomblet.point1			= point1 
+	currentBomblet.lastPos 			= point1
+
+	local predictedBulletVelocity = VecScale(parentProjectile.predictedBulletVelocity,0.7)
+
+	predictedBulletVelocity = VecAdd(
+				predictedBulletVelocity,
+				VecScale(rndVec(currentBomblet.shellType.bomblet.dispersion),
+				math.log(parentProjectile.shellType.velocity)))
+	currentBomblet.predictedBulletVelocity = predictedBulletVelocity
+	currentBomblet.originVehicle = parentProjectile.originVehicle
+	currentBomblet.originPos 	  = bombletPos 
+	currentBomblet.originGun = parentProjectile.originGun
+	currentBomblet.timeToLive	  = parentProjectile.timeToLive
+	currentBomblet.dispersion 	  = 1
+	currentBomblet.penDepth = parentProjectile.penDepth
+	currentBomblet.maxChecks = parentProjectile.maxChecks
+	currentBomblet.bomblet = true
+	currentBomblet.shellType.airburst = false
+	currentBomblet.shellType.shellWidth = math.max(math.random() * 
+				(currentBomblet.shellType.shellWidth * 1),0.1 )
+	currentBomblet.shellType.shellHeight = math.max(math.random() * 
+				(currentBomblet.shellType.shellWidth * 1),0.1) 
+		
+
+	projectileHandler.shellNum = (projectileHandler.shellNum%#projectileHandler.shells) +1
+end
+
+
 function popProjectile(shell,hitTarget)
 
 
+		if(shell.shellType.payload=="cluster") then
+			if(VecLength(VecSub(shell.flightPos.pos,shell.originPos.pos))>10) then 
+				Explosion(shell.flightPos.pos,shell.shellType.explosionSize)
+			end
+			initClusterBomblets(shell)
+			shell.penDepth = 0
+			
+		end
 		local penetration,passThrough,test,penDepth,dist,spallValue =  getProjectilePenetration(shell,hitTarget)
-		-- shell.penDepth = shell.penDepth - penDepth
-
 		local holeModifier = math.random(-15,15)/100
-			-- DebugPrint("1".." "..shell.penDepth)
-
 		impactEffect(shell,test.pos)
 
 
@@ -1988,28 +2109,30 @@ function popProjectile(shell,hitTarget)
 		SpawnParticle("smoke", shell.point1, Vec(0,1,0), (math.log(shell.shellType.caliber)/2)*(1+holeModifier), math.random(1,3))
 		SpawnParticle("fire", shell.point1, Vec(0,1,0), (math.log(shell.shellType.caliber)/4)*(1+holeModifier) , .25)
 
+
+
 		if(shell.shellType.payload and shell.shellType.payload == "HEAT")  then
 
 
-				MakeHole(shell.point1,shell.shellType.bulletdamage[1]*(1+holeModifier),shell.shellType.bulletdamage[2]*(1+holeModifier), shell.shellType.bulletdamage[3]*(1+holeModifier))
-				MakeHole(test.pos,shell.shellType.bulletdamage[1]*(1+holeModifier),shell.shellType.bulletdamage[2]*(1+holeModifier), shell.shellType.bulletdamage[3]*(1+holeModifier))
-				
-				if(dist > globalConfig.HEATRange or dist == 0) then
-					dist = ((shell.shellType.caliber/100)*2)*1.5
-				elseif dist <1 then
-					dist=(shell.shellType.caliber/100)*2
-				end
-
-				local explosionPos = test.pos
-				-- DebugPrint(dist)
-				-- DebugPrint((shell.shellType.caliber/100)*2)
-				for i=1,dist*1.5,0.75 do
-					-- DebugPrint("test")
-					explosionPos = TransformToParentPoint(test, Vec(0,i*1,0))
-		    		-- explosionPos = VecAdd(explosionPos, test.pos)
-					Explosion(explosionPos,0.5)
-				end
+			MakeHole(shell.point1,shell.shellType.bulletdamage[1]*(1+holeModifier),shell.shellType.bulletdamage[2]*(1+holeModifier), shell.shellType.bulletdamage[3]*(1+holeModifier))
+			MakeHole(test.pos,shell.shellType.bulletdamage[1]*(1+holeModifier),shell.shellType.bulletdamage[2]*(1+holeModifier), shell.shellType.bulletdamage[3]*(1+holeModifier))
 			
+			if(dist > globalConfig.HEATRange or dist == 0) then
+				dist = ((shell.shellType.caliber/100)*2)*1.5
+			elseif dist <1 then
+				dist=(shell.shellType.caliber/100)*2
+			end
+
+			local explosionPos = test.pos
+			-- DebugPrint(dist)
+			-- DebugPrint((shell.shellType.caliber/100)*2)
+			for i=1,dist*1.5,0.75 do
+				-- DebugPrint("test")
+				explosionPos = TransformToParentPoint(test, Vec(0,i*1,0))
+	    		-- explosionPos = VecAdd(explosionPos, test.pos)
+				Explosion(explosionPos,0.5)
+			end
+		
 			shell.active = false
 			for key,val in ipairs( shell ) do 
 				val = nil
@@ -2018,21 +2141,22 @@ function popProjectile(shell,hitTarget)
 			shell = deepcopy(projectileHandler.defaultShell)
 
 		elseif(shell.shellType.payload and shell.shellType.payload == "HESH") then
-					local explosionPos = TransformToParentPoint(Transform(shell.point1,test.rot), Vec(0,-.45,0))
-					Explosion(explosionPos,0.5)
-					explosionPos = TransformToParentPoint(test, Vec(0,.35,0))
-					MakeHole(explosionPos,shell.shellType.bulletdamage[1]*((1.4+holeModifier)*.5),
-								shell.shellType.bulletdamage[2]*((1.2+holeModifier)*.5), 
-								shell.shellType.bulletdamage[3]*((1.2+holeModifier)*0.5))
+			local explosionPos = TransformToParentPoint(Transform(shell.point1,test.rot), Vec(0,-.45,0))
+			Explosion(explosionPos,0.5)
+			explosionPos = TransformToParentPoint(test, Vec(0,.35,0))
+			MakeHole(explosionPos,shell.shellType.bulletdamage[1]*((1.4+holeModifier)*.5),
+						shell.shellType.bulletdamage[2]*((1.2+holeModifier)*.5), 
+						shell.shellType.bulletdamage[3]*((1.2+holeModifier)*0.5))
 
-					projectileShrapnel(shell,test,spallValue)
-			
+			projectileShrapnel(shell,test,spallValue)
+	
 			shell.active = false
 			for key,val in ipairs( shell ) do 
 				val = nil
 
 			end
 			shell = deepcopy(projectileHandler.defaultShell)
+
 
 		elseif(shell.penDepth>0) then		
 			-- DebugPrint("2".." "..shell.penDepth)
@@ -2058,6 +2182,7 @@ function popProjectile(shell,hitTarget)
 		else
 			-- DebugPrint("3 ".." "..shell.penDepth)
 			if(shell.shellType.payload) then
+
 				if(shell.shellType.payload == "high-explosive") then
 					Explosion(test.pos,shell.shellType.explosionSize)
 				elseif(shell.shellType.payload == "explosive" or shell.shellType.payload == "HE" or shell.shellType.payload == "APHE") then 
@@ -2189,15 +2314,12 @@ function projectileOperations(projectile,dt )
 		DrawSprite(projectile.shellType.sprite, altloc, projectile.shellType.shellWidth, shellHeight, r, g, b, 1, 0, false)
 		altloc.rot = QuatRotateQuat(projectile.cannonLoc.rot,QuatEuler(90, 0,0))
 		DrawSprite(projectile.shellType.spriteRear, altloc, projectile.shellType.shellWidth, projectile.shellType.shellWidth, r, g, b, 1, 0, false)
-		
-
 		---
 		--- adding sound
 		if((projectile.shellType.flightLoopSound)) then
 			PlayLoop(projectile.shellType.flightLoopSound, projectile.cannonLoc.pos, 20)
 					
 		end
-
 		---
 		---
 
@@ -2207,31 +2329,9 @@ function projectileOperations(projectile,dt )
 
 		if(projectile.shellType.launcher and projectile.shellType.launcher == "guided") then
 			local gunPos = GetShapeWorldTransform(projectile.originGun)
-			-- if(vehicleFeatures.commanderPos) then
-			-- 	gunPos = GetShapeWorldTransform(vehicleFeatures.commanderPos)
-			-- end
 			local projectlePos =  TransformCopy(projectile.cannonLoc)
 			local length =  VecLength(VecSub(gunPos.pos,projectlePos.pos))
 			local atgmfwdPos = VecSub(TransformToParentPoint(gunPos, Vec(0,-length,0)),projectlePos.pos)
-
-			-- if(debugMode)then
-			-- 	DebugWatch("atgmFwd: ",VecStr(atgmfwdPos))
-			-- 	DebugWatch("gunPos: ",VecStr(gunPos.pos))
-			-- 	DebugWatch("atgmPos: ",VecStr(projectlePos.pos))
-			-- end
-			-- -- local atgmdirection = VecSub(atgmfwdPos, gunPos.pos)
-			-- gunPos =  TransformCopy(projectile.cannonLoc)
-			--  gunPos.rot  =  QuatRotateQuat(gunPos.rot,QuatEuler(00, -90, -90))
-			-- -- gunPos.pos = projectile.cannonLoc.pos
-			
-			-- local targetAngle =  QuatLookAt(atgmfwdPos,gunPos)
-			-- -- targetAngle = QuatSlerp(projectile.cannonLoc.rot, targetAngle, 0.5)
-			-- gunPos.rot = targetAngle
-			
-			-- atgmfwdPos = TransformToParentPoint(gunPos, Vec(0,0,100))
-
-			-- DebugWatch("atgmfwdPos 2: ",VecStr(atgmfwdPos))
-			-- atgmdirection = VecSub(atgmfwdPos,gunPos.pos )
 			for key,value in pairs(atgmfwdPos) do 
 				value = math.log(value)
 			end
@@ -2293,20 +2393,32 @@ function projectileOperations(projectile,dt )
 			end
 		end
 	
+		--- test for impact
+
 		local point2 = VecAdd(projectile.point1,VecScale(projectile.predictedBulletVelocity,dt))
 		QueryRejectBody(projectile.originVehicle)
 		QueryRejectShape(projectile.originGun)
 		QueryRequire("physical")
-		local hit, dist1,norm1,shape1 = QueryRaycast(projectile.point1, VecNormalize(VecSub(point2,projectile.point1)),VecLength(VecSub(point2,projectile.point1)))
+		
+		local rangeTestCoef = VecLength(VecSub(point2,projectile.point1))
+		if(projectile.shellType.airburst ==true) then
+			rangeTestCoef = math.max(25,rangeTestCoef*5)
+		end
+
+		local hit, dist1,norm1,shape1 = QueryRaycast(
+						projectile.point1, 
+						VecNormalize(VecSub(point2,projectile.point1)),
+						rangeTestCoef
+						)
 		
 		projectile.cannonLoc.rot = QuatRotateQuat(QuatLookAt(point2,projectile.point1),QuatEuler(00, 90, 90))
 		
 			if(hit)then 
+				-- DebugPrint(rangeTestCoef.." "..projectile.shellType.payload)
 				hitPos = VecAdd(projectile.point1, VecScale(VecNormalize(VecSub(point2,projectile.point1)),dist1))
+				projectile.flightPos = Transform(VecCopy(projectile.point1),QuatLookAt(point2,projectile.point1))
 				projectile.point1 = hitPos
 				 popProjectile(projectile,shape1)
-				-- -- Explosion(norm1.pos,0.5)
-				-- DebugPrint(VecStr(norm1))
 			else
 				projectile.point1 = point2
 			end
@@ -3218,7 +3330,7 @@ function turretAngle(x,y,z,turret)
 	return orientationFactor
 end
 
-function gunAngle(x,y,z,gun,gunJoint)
+function gunAngle_alt(x,y,z,gun,gunJoint)
 
 	local targetAngle, dist = getTargetAngle(gun)
 
@@ -3281,10 +3393,7 @@ function gunLaying(gun,barrelCoords,targetPos)
 	local bias = 0.05
 	gun.aimed = false
 
-	-- DebugWatch("gun up: ",
-	-- 		up)
-	-- DebugWatch("gun down: ",
-	-- 		down)
+
 
 	local dir = 0
 	if(up < down-bias*0.25)then  -- and up-bias*.5>0) then 
@@ -3294,7 +3403,16 @@ function gunLaying(gun,barrelCoords,targetPos)
 
 	end 
 	-- DebugWatch("dir",dir)
-	SetJointMotor(gun.gunJoint, dir*(bias*10))
+	SetJointMotor(gun.gunJoint,dir *(bias*10))
+	--SetJointMotorTarget(gun.gunJoint,GetJointMovement(gun.gunJoint)+5,4)
+	DebugWatch("gun up: ",
+			up)
+	DebugWatch("gun down: ",
+			down)
+
+	DebugWatch("dir: ",
+			dir)
+	DebugWatch("gun moveemnt: ",GetJointMovement(gun.gunJoint))
 end
 
 function gunAngle(x,y,z,gun,targetPos)
@@ -3596,6 +3714,12 @@ function playerInVehicle()
 		end
 	end
 	return inVehicle,currentVehicle 
+end
+
+--Return a random vector of desired length
+function rndVec(length)
+	local v = VecNormalize(Vec(math.random(-100,100), math.random(-100,100), math.random(-100,100)))
+	return VecScale(v, length)	
 end
 
 function addGun(gunJoint,attatchedShape,turretJoint)
